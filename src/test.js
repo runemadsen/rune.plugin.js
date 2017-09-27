@@ -2,11 +2,10 @@ const path = require('path');
 const glob = require("glob-all");
 const readFiles = require('read-multiple-files');
 const utils = require('./utils');
-const webpack = require('webpack');
 const Jasmine = require('jasmine');
-const WebpackDevServer = require('webpack-dev-server');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const opn = require('opn');
+const connect = require('connect');
+const serveStatic = require('serve-static');
 
 function filesToString(filenames, callback) {
 
@@ -22,6 +21,13 @@ function filesToString(filenames, callback) {
 
 function testBrowser() {
 
+  var specs = glob.sync('test/**/*.js');
+  var scripts = specs.map((f) => {
+    const relative = f.replace('test/', '');
+    return `<script src="${relative}" type="text/javascript"></script>`
+  });
+  var scriptsBundle = scripts.join('\n');
+
   const template = `<!DOCTYPE html>
 <html>
   <head>
@@ -31,37 +37,28 @@ function testBrowser() {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine-html.min.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/boot.min.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine.min.css" />
+    ${scriptsBundle}
   </head>
   <body>
   </body>
 </html>`
 
-  let entries = [
-    path.join(__dirname, '..', 'node_modules', 'webpack-dev-server/client') + '?http://localhost:9785/',
-    path.join(__dirname, '..', 'node_modules', 'webpack/hot/dev-server'),
-    './test/both/specs'
-  ]
+  let server = connect();
 
-  const webpackConfig = {
-    devServer: { inline: true },
-    entry: entries,
-    output: {
-      path: path.join(process.cwd(), 'build'),
-      filename: 'browser_test.js'
-    },
-    plugins: [
-      new HtmlWebpackPlugin({
-        inject: 'body',
-        filename: 'index.html',
-        templateContent: template
-      })
-    ]
-  };
+  // serve static file
+  server.use(serveStatic('test'));
 
-  const compiler = webpack(webpackConfig);
-  const server = new WebpackDevServer(compiler, { hot: true });
-  server.listen(9785);
-  opn('http://localhost:9785');
+  // serve index.html
+  server.use(function(req, res) {
+    res.writeHeader(200, {"Content-Type": "text/html"});
+    res.write(template);
+    res.end();
+  });
+
+  // run server and open in browser
+  server.listen(9786, function() {
+    opn('http://localhost:9786');
+  });
 }
 
 function testNode() {
