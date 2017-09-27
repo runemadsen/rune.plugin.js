@@ -4,11 +4,9 @@ const readFiles = require('read-multiple-files');
 const utils = require('./utils');
 const webpack = require('webpack');
 const Jasmine = require('jasmine');
-const jasmineCore = require('jasmine-core');
-const JasmineWebpackPlugin = require('jasmine-webpack-plugin');
 const WebpackDevServer = require('webpack-dev-server');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const fs = require('fs-extra')
+const opn = require('opn');
 
 function filesToString(filenames, callback) {
 
@@ -24,31 +22,25 @@ function filesToString(filenames, callback) {
 
 function testBrowser() {
 
-  // fs.copy(
-  //   path.join(jasmineCore.files.path, jasmineCore.files.cssFiles[0]),
-  //   path.join(process.cwd(), 'build', 'browser_test.css'),
-  //   { overwrite: false })
-  // .then(() => {
-  //   console.log('moved css')
-  // })
-
   const template = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
     <title>Jasmine Spec Runner</title>
-    <link rel="stylesheet" type="text/css" href="build/browser_test.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine-html.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/boot.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine.min.css" />
   </head>
   <body>
   </body>
 </html>`
 
   let entries = [
-    path.join(__dirname, '..', 'node_modules', 'webpack-dev-server/client?http://localhost:8080/'),
-    path.join(__dirname, '..', 'node_modules', 'webpack/hot/dev-server')
+    path.join(__dirname, '..', 'node_modules', 'webpack-dev-server/client') + '?http://localhost:9785/',
+    path.join(__dirname, '..', 'node_modules', 'webpack/hot/dev-server'),
+    './test/both/specs'
   ]
-  entries = entries.concat(jasmineCore.files.jsFiles.map(f => path.join(jasmineCore.files.path, f)))
-  entries.push('./test/both/specs');
 
   const webpackConfig = {
     devServer: { inline: true },
@@ -59,7 +51,8 @@ function testBrowser() {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        filename: 'browser_test.html',
+        inject: 'body',
+        filename: 'index.html',
         templateContent: template
       })
     ]
@@ -67,7 +60,8 @@ function testBrowser() {
 
   const compiler = webpack(webpackConfig);
   const server = new WebpackDevServer(compiler, { hot: true });
-  server.listen(8080);
+  server.listen(9785);
+  opn('http://localhost:9785');
 }
 
 function testNode() {

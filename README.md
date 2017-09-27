@@ -23,7 +23,7 @@ Then build your plugin for the browser:
 rune-plugin build
 ```
 
-You now have a file named after your plugin inside of `build`. This file works in the browser, and you library is available as a global on `Rune.Name`.
+You now have a file named after your plugin inside of `build`. This file works in the browser, and your library is available as a global on `Rune.Name`.
 
 If you want to override the default webpack config, you can do this with a `rune.plugin.js` file in the root of your repo. This file has to export a function that alters the config. This can be used if you have `require()` statements that should be ignored for the browser. The build process already ignores `rune.js`, as developers are expected to include it on the page before using a plugin.
 
@@ -53,7 +53,7 @@ This will run the specs in node directly.
 rune-plugin test node
 ```
 
-This will run the specs in a browser on localhost:8888/browser_test.html
+This will run the specs in a browser.
 
 ```
 rune-plugin test browser
