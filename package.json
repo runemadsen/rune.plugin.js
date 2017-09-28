@@ -1,6 +1,6 @@
 {
   "name": "rune.plugin.js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A command-line tool for building and publishing Rune.js plugins",
   "repository": {
     "type": "git",
