@@ -62,4 +62,4 @@ rune test browser
 
 These commands will also look for files named `matchers.js` and `helpers.js` inside of the `test` folder. You can put Jasmine-related code in those files.
 
-All tests will automatically have access to a `Rune` object and a `Rune.PLUGINNAME` object with your plugin in it. So tests should not use `require()`. The version of Rune is the one corresponding to the version of the plugin.
+All tests will automatically have access to a `Rune` object and a `Rune.PLUGINNAME` object with your plugin in it. So tests should not use `require()`.

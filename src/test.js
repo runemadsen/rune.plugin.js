@@ -13,9 +13,7 @@ const definition = utils.loadDefinition();
 
 function testBrowser() {
 
-  let scripts = [
-    path.join(__dirname, 'browser.js'),
-  ]
+  let scripts = [];
 
   // If this is main Rune.js lib test
   if(definition.name == 'rune.js') {
@@ -28,7 +26,7 @@ function testBrowser() {
     const pluginName = utils.nameToPluginName(definition.name);
     scripts = scripts.concat([
       'node_modules/rune.js/dist/rune.js',
-      `dist/rune.${pluginName}.js`
+      `dist/rune.${pluginName.toLowerCase()}.js`
     ]);
   }
 
@@ -50,10 +48,10 @@ function testBrowser() {
     <meta charset="UTF-8">
     <title>Jasmine Spec Runner</title>
     <script type="text/javascript">window.global = this;</script>
-    <script src="node_modules/jasmine-core/lib/jasmine-core/jasmine.js" type="text/javascript"></script>
-    <script src="node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js" type="text/javascript"></script>
-    <script src="node_modules/jasmine-core/lib/jasmine-core/boot.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="node_modules/jasmine-core/lib/jasmine-core/jasmine.css" />
+    <script src="node_modules2/jasmine-core/lib/jasmine-core/jasmine.js" type="text/javascript"></script>
+    <script src="node_modules2/jasmine-core/lib/jasmine-core/jasmine-html.js" type="text/javascript"></script>
+    <script src="node_modules2/jasmine-core/lib/jasmine-core/boot.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="node_modules2/jasmine-core/lib/jasmine-core/jasmine.css" />
     ${scriptTags}
   </head>
   <body>
@@ -67,8 +65,11 @@ function testBrowser() {
     // serve test files
     server.use('/test', serveStatic('test'));
 
-    // serve node_modules files
-    server.use('/node_modules', serveStatic(path.join(__dirname, '..', 'node_modules')));
+    // serve node_modules files from plugin
+    server.use('/node_modules', serveStatic(path.join(process.cwd(), 'node_modules')));
+
+    // serve node_modules files from this package
+    server.use('/node_modules2', serveStatic(path.join(__dirname, '..', 'node_modules')));
 
     // serve dist files
     server.use('/dist', serveStatic('dist'));

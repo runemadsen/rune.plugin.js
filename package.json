@@ -18,11 +18,9 @@
   "dependencies": {
     "connect": "^3.6.5",
     "glob-all": "^3.1.0",
-    "handlebars": "^4.0.10",
     "jasmine": "^2.8.0",
     "opn": "^5.1.0",
     "pascalcase": "^0.1.1",
-    "rune.js": "^1.0.3",
     "serve-static": "^1.12.6",
     "webpack": "^3.6.0",
     "yargs": "^9.0.1"
