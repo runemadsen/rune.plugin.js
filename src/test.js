@@ -3,9 +3,11 @@ const glob = require("glob-all");
 const readFiles = require('read-multiple-files');
 const utils = require('./utils');
 const Jasmine = require('jasmine');
+const JasmineCore = require('jasmine-core');
 const opn = require('opn');
 const connect = require('connect');
 const serveStatic = require('serve-static');
+const fs = require('fs');
 
 function filesToString(filenames, callback) {
 
@@ -33,10 +35,10 @@ function testBrowser() {
   <head>
     <meta charset="UTF-8">
     <title>Jasmine Spec Runner</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine-html.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/boot.min.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine.min.css" />
+    <script src="jasmine/jasmine.js" type="text/javascript"></script>
+    <script src="jasmine/jasmine-html.js" type="text/javascript"></script>
+    <script src="jasmine/boot.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="jasmine/jasmine.css" />
     ${scriptsBundle}
   </head>
   <body>
@@ -45,8 +47,11 @@ function testBrowser() {
 
   let server = connect();
 
-  // serve static file
+  // serve test files
   server.use(serveStatic('test'));
+
+  // serve jasmine files
+  server.use('/jasmine', serveStatic(JasmineCore.files.path));
 
   // serve index.html
   server.use(function(req, res) {

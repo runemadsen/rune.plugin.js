@@ -1,6 +1,6 @@
 {
   "name": "rune.plugin.js",
-  "version": "0.0.1",
+  "version": "1.0.2",
   "description": "A command-line tool for building and publishing Rune.js plugins",
   "repository": {
     "type": "git",
@@ -17,13 +17,14 @@
   "homepage": "http://runemadsen.github.io/rune.js/",
   "dependencies": {
     "connect": "^3.6.5",
-    "serve-static": "^1.12.6",
     "glob-all": "^3.1.0",
     "handlebars": "^4.0.10",
     "jasmine": "^2.8.0",
     "opn": "^5.1.0",
     "pascalcase": "^0.1.1",
     "read-multiple-files": "^2.0.0-2",
+    "rune.js": "^1.0.2",
+    "serve-static": "^1.12.6",
     "webpack": "^3.6.0",
     "yargs": "^9.0.1"
   },

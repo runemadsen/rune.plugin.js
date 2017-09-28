@@ -7,6 +7,8 @@ Some rules:
 - The plugin has to be named `rune.NAME.js`
 - The plugin has to work in node without any compilation, and it should be able to publish to npm via `npm publish`.
 
+The plugin is versioned in the same version as the Rune.js version that it uses for testing purposes.
+
 ## Installation
 
 First install the module:
