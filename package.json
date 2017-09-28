@@ -7,7 +7,7 @@
     "url": "git://github.com/runemadsen/rune.plugin.js"
   },
   "bin": {
-    "rune-plugin": "bin/index.js"
+    "rune": "bin/index.js"
   },
   "author": "runemadsen",
   "license": "MIT",
@@ -22,7 +22,6 @@
     "jasmine": "^2.8.0",
     "opn": "^5.1.0",
     "pascalcase": "^0.1.1",
-    "read-multiple-files": "^2.0.0-2",
     "rune.js": "^1.0.3",
     "serve-static": "^1.12.6",
     "webpack": "^3.6.0",

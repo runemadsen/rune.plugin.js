@@ -2,24 +2,31 @@ const path = require('path')
 const webpack = require('webpack');
 const utils = require('./utils');
 const definition = utils.loadDefinition();
-const pluginName = utils.nameToPluginName(definition.name);
 
 function build(callback) {
 
   const definition = utils.loadDefinition();
 
-  // Default webpack config
+  // Webpack config for all plugins and main Rune.js lib
   let webpackConfig = {
-    externals: {
-      'rune.js' : 'Rune'
-    },
     entry: path.join(process.cwd(), definition.main),
     output: {
       libraryTarget: "var",
-      library: ["Rune", pluginName],
       path: path.join(process.cwd(), 'dist'),
       filename: definition.name
     }
+  }
+
+  // Special handling for the main Rune.js lib
+  if(definition.name == 'rune.js') {
+    webpackConfig.output.library = "Rune"
+  }
+  else {
+    const pluginName = utils.nameToPluginName(definition.name);
+    webpackConfig.output.library = ["Rune", pluginName];
+    webpackConfig.externals = {
+      'rune.js' : 'Rune'
+    };
   }
 
   // Allow plugins to override config

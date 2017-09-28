@@ -1,6 +1,5 @@
 const path = require('path');
 const glob = require("glob-all");
-const readFiles = require('read-multiple-files');
 const utils = require('./utils');
 const Jasmine = require('jasmine');
 const JasmineCore = require('jasmine-core');
@@ -11,44 +10,51 @@ const fs = require('fs');
 const build = require('./build');
 
 const definition = utils.loadDefinition();
-const pluginName = utils.nameToPluginName(definition.name);
-
-function filesToString(filenames, callback) {
-
-  var files = glob.sync(filenames);
-
-  readFiles(files, 'utf8', (err, contents) => {
-    if (err) {
-      callback("Error: Could not read test file")
-    }
-    callback(null, contents.join('\n'));
-  });
-}
 
 function testBrowser() {
 
-  var specs = glob.sync([
-    'test/both/*.js',
-    'test/browser/*.js',
-  ]);
-  var scripts = specs.map((f) => {
-    const relative = f.replace('test/', '');
-    return `<script src="${relative}" type="text/javascript"></script>`
-  });
-  var scriptsBundle = scripts.join('\n');
+  let scripts = [
+    path.join(__dirname, 'browser.js'),
+  ]
+
+  // If this is main Rune.js lib test
+  if(definition.name == 'rune.js') {
+    scripts = scripts.concat([
+      'dist/rune.js'
+    ]);
+  }
+  // If this is a plugin test
+  else {
+    const pluginName = utils.nameToPluginName(definition.name);
+    scripts = scripts.concat([
+      'node_modules/rune.js/dist/rune.js',
+      `dist/rune.${pluginName}.js`
+    ]);
+  }
+
+  // load matchers, helpers, and tests shared for plugins and main lib
+  scripts = scripts.concat(glob.sync([
+    'test/matchers.js',
+    'test/helpers.js',
+    'test/both/**/*.js',
+    'test/browser/**/*.js',
+  ]));
+
+  const scriptTags = scripts.map((f) => {
+    return `<script src="${f}" type="text/javascript"></script>`
+  }).join('\n');
 
   const template = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
     <title>Jasmine Spec Runner</title>
-    <script src="node_modules/rune.js/dist/rune.js" type="text/javascript"></script>
-    <script src="dist/rune.${pluginName}.js" type="text/javascript"></script>
+    <script type="text/javascript">window.global = this;</script>
     <script src="node_modules/jasmine-core/lib/jasmine-core/jasmine.js" type="text/javascript"></script>
     <script src="node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js" type="text/javascript"></script>
     <script src="node_modules/jasmine-core/lib/jasmine-core/boot.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="node_modules/jasmine-core/lib/jasmine-core/jasmine.css" />
-    ${scriptsBundle}
+    ${scriptTags}
   </head>
   <body>
   </body>
@@ -59,7 +65,7 @@ function testBrowser() {
     let server = connect();
 
     // serve test files
-    server.use(serveStatic('test'));
+    server.use('/test', serveStatic('test'));
 
     // serve node_modules files
     server.use('/node_modules', serveStatic(path.join(__dirname, '..', 'node_modules')));
@@ -84,30 +90,20 @@ function testBrowser() {
 
 function testNode() {
 
-  filesToString([
+  const filenames = glob.sync([
+    path.join(__dirname, 'node.js'),
+    'test/matchers.js',
+    'test/helpers.js',
     'test/both/**/*.js',
     'test/node/**/*.js'
-  ], (err, contents) => {
+  ]);
 
-    const nodeRequires = `var Rune = require('rune.js'); Rune.${pluginName} = require('../${definition.main}');\n`
-    const tmpContents = nodeRequires + contents;
-
-    fs.writeFile(`test/bundle.js`, tmpContents, function(err) {
-
-      if(err) {
-        return console.error(err);
-      }
-
-      let jasmine = new Jasmine();
-      jasmine.loadConfig({
-        spec_dir: 'test',
-        spec_files: [ 'bundle.js' ]
-      });
-      jasmine.execute();
-
-    });
-
+  const jasmine = new Jasmine();
+  jasmine.loadConfig({
+    spec_dir: '.',
+    spec_files: filenames
   });
+  jasmine.execute();
 }
 
 
