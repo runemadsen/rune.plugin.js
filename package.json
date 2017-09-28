@@ -1,6 +1,6 @@
 {
   "name": "rune.plugin.js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A command-line tool for building and publishing Rune.js plugins",
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
     "opn": "^5.1.0",
     "pascalcase": "^0.1.1",
     "read-multiple-files": "^2.0.0-2",
-    "rune.js": "^1.0.2",
+    "rune.js": "^1.0.3",
     "serve-static": "^1.12.6",
     "webpack": "^3.6.0",
     "yargs": "^9.0.1"

@@ -1,6 +1,8 @@
 const path = require('path')
 const webpack = require('webpack');
 const utils = require('./utils');
+const definition = utils.loadDefinition();
+const pluginName = utils.nameToPluginName(definition.name);
 
 function build(callback) {
 
@@ -13,7 +15,9 @@ function build(callback) {
     },
     entry: path.join(process.cwd(), definition.main),
     output: {
-      path: path.join(process.cwd(), 'build'),
+      libraryTarget: "var",
+      library: ["Rune", pluginName],
+      path: path.join(process.cwd(), 'dist'),
       filename: definition.name
     }
   }

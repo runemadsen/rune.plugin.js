@@ -8,6 +8,10 @@ const opn = require('opn');
 const connect = require('connect');
 const serveStatic = require('serve-static');
 const fs = require('fs');
+const build = require('./build');
+
+const definition = utils.loadDefinition();
+const pluginName = utils.nameToPluginName(definition.name);
 
 function filesToString(filenames, callback) {
 
@@ -23,7 +27,10 @@ function filesToString(filenames, callback) {
 
 function testBrowser() {
 
-  var specs = glob.sync('test/**/*.js');
+  var specs = glob.sync([
+    'test/both/*.js',
+    'test/browser/*.js',
+  ]);
   var scripts = specs.map((f) => {
     const relative = f.replace('test/', '');
     return `<script src="${relative}" type="text/javascript"></script>`
@@ -35,41 +42,47 @@ function testBrowser() {
   <head>
     <meta charset="UTF-8">
     <title>Jasmine Spec Runner</title>
-    <script src="jasmine/jasmine.js" type="text/javascript"></script>
-    <script src="jasmine/jasmine-html.js" type="text/javascript"></script>
-    <script src="jasmine/boot.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="jasmine/jasmine.css" />
+    <script src="node_modules/rune.js/dist/rune.js" type="text/javascript"></script>
+    <script src="dist/rune.${pluginName}.js" type="text/javascript"></script>
+    <script src="node_modules/jasmine-core/lib/jasmine-core/jasmine.js" type="text/javascript"></script>
+    <script src="node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js" type="text/javascript"></script>
+    <script src="node_modules/jasmine-core/lib/jasmine-core/boot.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="node_modules/jasmine-core/lib/jasmine-core/jasmine.css" />
     ${scriptsBundle}
   </head>
   <body>
   </body>
 </html>`
 
-  let server = connect();
+  build(() => {
 
-  // serve test files
-  server.use(serveStatic('test'));
+    let server = connect();
 
-  // serve jasmine files
-  server.use('/jasmine', serveStatic(JasmineCore.files.path));
+    // serve test files
+    server.use(serveStatic('test'));
 
-  // serve index.html
-  server.use(function(req, res) {
-    res.writeHeader(200, {"Content-Type": "text/html"});
-    res.write(template);
-    res.end();
-  });
+    // serve node_modules files
+    server.use('/node_modules', serveStatic(path.join(__dirname, '..', 'node_modules')));
 
-  // run server and open in browser
-  server.listen(9786, function() {
-    opn('http://localhost:9786');
-  });
+    // serve dist files
+    server.use('/dist', serveStatic('dist'));
+
+    // serve index.html
+    server.use(function(req, res) {
+      res.writeHeader(200, {"Content-Type": "text/html"});
+      res.write(template);
+      res.end();
+    });
+
+    // run server and open in browser
+    server.listen(9786, function() {
+      opn('http://localhost:9786');
+    });
+
+  })
 }
 
 function testNode() {
-
-  const definition = utils.loadDefinition();
-  const pluginName = utils.nameToPluginName(definition.name);
 
   filesToString([
     'test/both/**/*.js',
