@@ -11,7 +11,7 @@ if(definition.name == 'rune.js') {
 }
 // For plugins, require Rune from package and plugin from source
 else {
-  global.Rune = require('rune.js');
+  global.Rune = require(path.join(process.cwd(), 'node_modules', 'rune.js'));
   const pluginName = utils.nameToPluginName(definition.name);
   global.Rune[pluginName] = require(path.join(process.cwd(), definition.main));
 }
